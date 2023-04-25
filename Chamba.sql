@@ -23,7 +23,7 @@ ID_Municipio int not null,
 
 create table Cedis 
 (
-ID_Cedis int not null identity primary key,
+ID_Cedis int not null,
 --ID_Almacen int foreign key references Almacen (ID_Almacen),
 Nombre nvarchar (50) null,
 Direccion nvarchar (100) not null,
@@ -31,7 +31,7 @@ Telefono varchar (20),
 )
 create table Sucursal
 (
-ID_Sucursal int not null identity primary key,
+ID_Sucursal int not null,
 --ID_Almacen int foreign key references Almacen (ID_Almacen),
 Nombre nvarchar (50) null,
 Direccion nvarchar (100) not null,
@@ -53,7 +53,7 @@ FamiliaDescripcion nvarchar (100) not null,
 )
 create table Producto 
 (
-UPC int not null identity primary key, 
+UPC int not null, 
 --ID_Familia int foreign key references Familia (ID_Familia),
 --ID_Componenteactivo int foreign key references Componenteactivo (ID_Componenteactivo),
 Nombre nvarchar (50) not null,
@@ -64,12 +64,12 @@ PrecioVenta money not null default 0.0,
 create table Inventario 
 (
 --ID_Almacen int foreign key references Almacen (ID_Almacen),
-UPC int foreign key references Producto (UPC),
+--UPC int foreign key references Producto (UPC),
 Existencia int not null default 0,
 )
 create table Proveedor
 (
-ID_Proveedor int not null identity primary key, 
+ID_Proveedor int not null, 
 Nombre nvarchar(50) not null,
 ApellidoPaterno nvarchar (50) null,
 ApellidoMaterno nvarchar (50) null,
@@ -77,15 +77,15 @@ Telefono varchar (20),
 )
 create table CompraAProveedor
 (
-UPC int foreign key references Producto (UPC),
-ID_Proveedor int foreign key references Proveedor (ID_Proveedor),
+--UPC int foreign key references Producto (UPC),
+--ID_Proveedor int foreign key references Proveedor (ID_Proveedor),
 Costo money not null default 0.0,
 Cantidad int not null default 0,
 )
 create table Detalle 
 (
-ID_Pedido int not null identity primary key,
-UPC int foreign key references Producto (UPC),
+--ID_Pedido int not null identity primary key,
+--UPC int foreign key references Producto (UPC),
 Cantidad int not null,
 PrecioFinal money not null default 0.0,
 )
@@ -159,6 +159,12 @@ Alter table Entrega add constraint PK_ID_Entrega primary key (ID_Entrega)
 Alter table Tipodecliente add constraint PK_ID_Tipodecliente primary key (ID_Tipodecliente)
 Alter table Cliente add constraint PK_ID_Cliente primary key (ID_Cliente)
 Alter table Formatodepago add constraint PK_ID_Formatodepago primary key (ID_Formatodepago)
+Alter table Cedis add constraint PK_ID_Cedis primary key (ID_Cedis)
+Alter table Proveedor add constraint PK_ID_Proveedor primary key (ID_Proveedor)
+Alter table Sucursal add constraint PK_ID_Sucursal primary key (ID_Sucursal)
+Alter table Producto add constraint PK_UPC primary key (UPC)
+
+
 
 
 --pk
@@ -168,6 +174,7 @@ Alter table Almacen add constraint pk_Almacen primary key (ID_Almacen)
 --fk
 Alter table Municipio add constraint fk_Municipio foreign key (ID_Zona) references Zona (ID_Zona)
 Alter table Almacen add constraint fk_Almacen foreign key (ID_Zona,ID_Municipio) references Municipio (ID_Zona,ID_Municipio)
+
 
 
 
