@@ -91,14 +91,14 @@ PrecioFinal money not null default 0.0,
 )
 create table Formatodepago 
 (
-ID_Formatodepago int not null identity primary key,
+ID_Formatodepago int not null,
 Efectivo int null,
 Credito int null,
 Tarjeta int null,
 ) 
 create table Cliente 
 (
-ID_Cliente int not null identity primary key,
+ID_Cliente int not null,
 Nombre nvarchar(50) not null,
 ApellidoPaterno nvarchar (50) null,
 ApellidoMaterno nvarchar (50) null,
@@ -108,7 +108,7 @@ Direccion nvarchar (100) not null,
 )
 create table Tipodecliente
 (
-ID_Tipodecliente int not null identity primary key, 
+ID_Tipodecliente int not null , 
 Nombre nvarchar (50),
 Descripcion nvarchar (50),
 )
@@ -119,7 +119,7 @@ Nombre nvarchar(50) not null,
 )
 create table Entrega 
 (
---ID_Entrega int not null identity primary key, 
+ID_Entrega int not null , 
 --ID_Almacen int foreign key references Almacen (ID_Almacen),
 --ID_Pedido int foreign key references Pedido (ID_Pedido),
 --ID_Tipodeentrega int foreign key references Tipodeentrega (ID_Tipodeentrega),
@@ -130,7 +130,7 @@ Recibio nvarchar (30) null,
 )
 create table Pedido 
 (
---ID_Pedido int not null identity primary key, 
+ID_Pedido int not null, 
 --ID_Entrega int foreign key references Entrega (ID_Entrega),
 --ID_Cliente int foreign key references Cliente (ID_Cliente),
 --ID_Formatodepago int foreign key references Formatodepago (ID_Formatodepago),
@@ -154,6 +154,13 @@ Alter table Empleado add constraint PK_ID_Empleado primary key (ID_Empleado)
 Alter table Tipodeentrega add constraint PK_ID_Tipodeentrega primary key (ID_Tipodeentrega)
 Alter table Familia add constraint PK_ID_Familia primary key (ID_Familia)
 Alter table Componenteactivo add constraint PK_ID_Componenteactivo primary key (ID_Componenteactivo)
+Alter table Pedido add constraint PK_ID_Pedido primary key (ID_Pedido)
+Alter table Entrega add constraint PK_ID_Entrega primary key (ID_Entrega)
+Alter table Tipodecliente add constraint PK_ID_Tipodecliente primary key (ID_Tipodecliente)
+Alter table Cliente add constraint PK_ID_Cliente primary key (ID_Cliente)
+Alter table Formatodepago add constraint PK_ID_Formatodepago primary key (ID_Formatodepago)
+
+
 --pk
 Alter table Zona add constraint pk_ID_Zona primary key (ID_Zona)
 Alter table Municipio add constraint pk_Municipio_ID_Zona primary key (ID_Zona,ID_Municipio)
@@ -162,7 +169,8 @@ Alter table Almacen add constraint pk_Almacen primary key (ID_Almacen)
 Alter table Municipio add constraint fk_Municipio foreign key (ID_Zona) references Zona (ID_Zona)
 Alter table Almacen add constraint fk_Almacen foreign key (ID_Zona,ID_Municipio) references Municipio (ID_Zona,ID_Municipio)
 
-select * from Municipio
+
+
+select * from Almacen
 
 --Comando para borrar tablas ---> drop table nombre
-
