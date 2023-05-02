@@ -62,11 +62,11 @@ group by c.Nombre
 --9-La cantidad total de inventario que tiene cada almacen
 
 select a.ID_Almacen,
-sum(i.Existencia) as Cantidad_Inventario
+sum(i.Existencia) as TotalInventario
 from Almacen a
 inner join Inventario i on a.ID_Almacen = i.ID_Almacen
 group by a.ID_Almacen, a.Nombre
-order by Cantidad_Inventario asc;
+order by TotalInventario asc;
 
 --10-El formato de pago que es mas utilizado en los productos que contienen el ID_Familia 1
 select top 1 f.Nombre, count(*) as cantidad
@@ -101,7 +101,7 @@ order by TotalVentas desc
 
 --14- Se quiere consultar cual es la cantidad total de CEDIS que se encuentra en cada Zona 
 
-select z.ID_Zona, COUNT(c.ID_Cedis) as Numero_de_Cedis
+select z.ID_Zona, count(c.ID_Cedis) as Numero_de_Cedis
 from Zona z
 inner join Almacen a on z.ID_Zona = a.ID_Zona
 inner join Cedis c on a.ID_Almacen = c.ID_Almacen
@@ -109,9 +109,85 @@ group by z.ID_Zona, z.Nombre
 order by Numero_de_Cedis desc
 
 --15- Se requiere consultar cual es la cantidad de pedidos hechos por cada tipo de cliente
-select tc.Nombre AS TipoCliente, count(*) as NumPedidos
-FROM Pedido p
-INNER JOIN Cliente c ON p.ID_Cliente = c.ID_Cliente
-INNER JOIN Tipodecliente tc ON c.ID_Tipodecliente = tc.ID_Tipodecliente
-GROUP BY tc.Nombre
-ORDER BY NumPedidos DESC
+select tc.Nombre as TipoCliente, count(*) as NumPedidos
+from Pedido p
+inner join Cliente c on p.ID_Cliente = c.ID_Cliente
+inner join Tipodecliente tc on c.ID_Tipodecliente = tc.ID_Tipodecliente
+group by tc.Nombre
+order by NumPedidos desc
+
+--16- Se requiere consultar cual es la cantidad de ordenes de pedidos totales durante cada mes
+select datepart(month, Fecha) as Mes, count(*) as CantidadDeOrdenes
+from Pedido
+group by datepart(month, Fecha)
+order by Mes 
+
+--17- Se requiere consultar que cantidad total de componentesactivos esta siendo distribuida por cada uno de los distribuidores
+
+select P.Nombre as Proveedor, CA.Nombre as ComponenteActivo, sum(CAP.Cantidad) as CantidadTotal
+from Proveedor P
+inner join CompraAProveedor CAP on CAP.ID_Proveedor = P.ID_Proveedor
+inner join Componenteactivo CA on CA.ID_Componenteactivo = CA.ID_Componenteactivo
+group by P.Nombre, CA.Nombre
+order by P.Nombre, CantidadTotal asc;
+
+--18- Cual es el almacen que cuenta con mayor cantidad de empleados 
+select a.Nombre AS Almacen, count(e.ID_Empleado) as Empleados
+from Almacen a
+inner join Empleado e ON a.ID_Almacen = e.ID_Almacen
+group by a.Nombre
+having count(e.ID_Empleado) = (select max(NumEmpleados) from (
+    select a.ID_Almacen, count(e.ID_Empleado) as NumEmpleados
+    from Almacen a
+    inner join Empleado e on a.ID_Almacen = e.ID_Almacen
+    group by a.ID_Almacen
+) t)
+
+--19- Cual es el Metodo De Pago mas usado por Clientes de tipo Domestico
+
+select top 1 f.Nombre as MetodoDePago, count(*) as Cantidad
+from Pedido p
+inner join Cliente c on p.ID_Cliente = c.ID_Cliente
+inner join Formatodepago f on p.ID_Formatodepago = f.ID_Formatodepago
+inner join Tipodecliente t on c.ID_Tipodecliente = t.ID_Tipodecliente
+where t.Nombre = 'Domestico'
+group by f.Nombre
+order by Cantidad desc;
+
+--20- Cual es el Tipo de entrega mas frecuente para Clientes de tipo Domestico
+
+select top 1 e.Nombre, COUNT(*) as Cantidad
+from Entrega as en
+inner join Tipodeentrega as e on en.ID_Tipodeentrega = e.ID_Tipodeentrega
+inner join Pedido as p on en.ID_Pedido = p.ID_Pedido
+inner join Cliente as c on p.ID_Cliente = c.ID_Cliente
+inner join Tipodecliente as tc on c.ID_Tipodecliente = tc.ID_Tipodecliente
+where tc.Nombre = 'Domestico'
+group by e.Nombre
+order by Cantidad desc;
+
+--21- Se quiere consultar cual es la presencia Total de todos los componentes activos en los distintos Productos que tenemos
+select c.Nombre AS ComponenteActivo, count(distinct p.UPC) as UPC_Count
+from Producto p
+inner join Componenteactivo c on p.ID_Componenteactivo = c.ID_Componenteactivo
+group by p.ID_Componenteactivo, c.Nombre
+having count(distinct p.UPC) > 1
+
+--22- Se require consultar la cantidad total de pedidos de cada mes con los cuales se ha pagado con el formato de pago tarjeta
+select month(Fecha) as Mes, count(*) as NumeroPedidos
+from Pedido
+where ID_Formatodepago = (select ID_Formatodepago from Formatodepago where Nombre = 'Tarjeta')
+group by month(Fecha)
+order by NumeroPedidos desc
+
+--23- Se desea consultar el telefono de todos los empleados del Cedis 1 , Posdata se me olvido insertarle el Telefono a los Empleados en los Datos
+
+select Empleado.Telefono
+from Empleado
+inner join Almacen on Empleado.ID_Almacen = Almacen.ID_Almacen
+inner join Cedis on Almacen.ID_Almacen = Cedis.ID_Almacen
+where Cedis.ID_Cedis = 1
+
+--24- 
+
+
