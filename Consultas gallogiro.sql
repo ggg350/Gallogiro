@@ -49,15 +49,12 @@ from Empleado e
 inner join Almacen a on e.ID_Almacen = a.ID_Almacen
 inner join Sucursal s on a.ID_Almacen = s.ID_Almacen;
 
---8-Los clientes que han comprado Productos provenientes de la familia 'Herbicidas' asi como las veces que lo han comprado
-select c.Nombre, count(*) as Cantidadcomprada
-from Cliente c
-inner join Pedido p on c.ID_Cliente = p.ID_Cliente
-inner join Detalle d on p.ID_Pedido = d.ID_Pedido
-inner join Producto pr on d.UPC = pr.UPC
-inner join Familia f on pr.ID_Familia = f.ID_Familia
-where f.FamiliaNombre = 'Herbicidas'
-group by c.Nombre
+--8-Dame los nombres de los Proveedores asi como el nombre y la cantidad de los articulos que han Proveido 
+
+select p.Nombre, cp.Cantidad, pr.Nombre
+from CompraAProveedor cp
+inner join Producto p on cp.UPC = p.UPC
+inner join Proveedor pr on cp.ID_Proveedor = pr.ID_Proveedor
 
 --9-La cantidad total de inventario que tiene cada almacen
 
@@ -143,28 +140,15 @@ having count(e.ID_Empleado) = (select max(NumEmpleados) from (
     group by a.ID_Almacen
 ) t)
 
---19- Cual es el Metodo De Pago mas usado por Clientes de tipo Domestico
+--19- Se desea consultar todos aquellos clientes que poseen un credito mayor o igual a las 7500 Unidades
 
-select top 1 f.Nombre as MetodoDePago, count(*) as Cantidad
-from Pedido p
-inner join Cliente c on p.ID_Cliente = c.ID_Cliente
-inner join Formatodepago f on p.ID_Formatodepago = f.ID_Formatodepago
-inner join Tipodecliente t on c.ID_Tipodecliente = t.ID_Tipodecliente
-where t.Nombre = 'Domestico'
-group by f.Nombre
-order by Cantidad desc;
+select Cliente.Nombre, Cliente.ApellidoPaterno, Cliente.ApellidoMaterno from Cliente
+where Cliente.Credito >= '7500' 
 
---20- Cual es el Tipo de entrega mas frecuente para Clientes de tipo Domestico
+--20- Se requiere saber el Precio de Venta de cada Producto 
 
-select top 1 e.Nombre, COUNT(*) as Cantidad
-from Entrega as en
-inner join Tipodeentrega as e on en.ID_Tipodeentrega = e.ID_Tipodeentrega
-inner join Pedido as p on en.ID_Pedido = p.ID_Pedido
-inner join Cliente as c on p.ID_Cliente = c.ID_Cliente
-inner join Tipodecliente as tc on c.ID_Tipodecliente = tc.ID_Tipodecliente
-where tc.Nombre = 'Domestico'
-group by e.Nombre
-order by Cantidad desc;
+select P.UPC,  P.PrecioVenta
+from Producto P
 
 --21- Se quiere consultar cual es la presencia Total de todos los componentes activos en los distintos Productos que tenemos
 select c.Nombre AS ComponenteActivo, count(distinct p.UPC) as UPC_Count
@@ -188,6 +172,73 @@ inner join Almacen on Empleado.ID_Almacen = Almacen.ID_Almacen
 inner join Cedis on Almacen.ID_Almacen = Cedis.ID_Almacen
 where Cedis.ID_Cedis = 1
 
---24- 
+--24- Se desea consultar todo lo que se pago a proovedores durante el transcurso de todo el mes de Mayo de 2022
+
+select sum(CostoTotal) as PagoAProveedoresMayo2022
+from CompraAProveedor
+where Fecha between '2022-05-01' and '2022-05-31'
+
+--25-Se desea Tener la Cantidad Total de Productos con un precio mayor a las $900 Unidades que hay distribuidos en todos los Almacenes de cada Zona
+
+select Zona.Nombre as Zona, sum(Inventario.Existencia) AS TotalDeProductos
+from Zona
+inner join Almacen on Zona.ID_Zona = Almacen.ID_Zona
+inner join Inventario on Almacen.ID_Almacen = Inventario.ID_Almacen
+inner join Producto on Inventario.UPC = Producto.UPC
+where Producto.PrecioVenta > 900
+group by Zona.Nombre
+
+--26- Cual es el Metodo De Pago mas usado por Clientes de tipo Domestico
+
+select top 1 f.Nombre as MetodoDePago, count(*) as Cantidad
+from Pedido p
+inner join Cliente c on p.ID_Cliente = c.ID_Cliente
+inner join Formatodepago f on p.ID_Formatodepago = f.ID_Formatodepago
+inner join Tipodecliente t on c.ID_Tipodecliente = t.ID_Tipodecliente
+where t.Nombre = 'Domestico'
+group by f.Nombre
+order by Cantidad desc;
+
+--27- Se desea consultar Las unidades totales vendidas de cada Familia de Productos
+
+select 
+    f.FamiliaNombre, 
+    sum(d.Cantidad) as UnidadesTotalesVendidas
+from 
+    Producto p 
+    inner join Detalle d on p.UPC = d.UPC 
+    inner join Familia f on p.ID_Familia = f.ID_Familia 
+group by
+    f.FamiliaNombre 
+order by
+    sum(d.Cantidad) desc 
+
+--28- Cual es el Tipo de entrega mas frecuente para Clientes de tipo Domestico
+
+select top 1 e.Nombre, COUNT(*) as Cantidad
+from Entrega as en
+inner join Tipodeentrega as e on en.ID_Tipodeentrega = e.ID_Tipodeentrega
+inner join Pedido as p on en.ID_Pedido = p.ID_Pedido
+inner join Cliente as c on p.ID_Cliente = c.ID_Cliente
+inner join Tipodecliente as tc on c.ID_Tipodecliente = tc.ID_Tipodecliente
+where tc.Nombre = 'Domestico'
+group by e.Nombre
+order by Cantidad desc;
+--29- Se desea consultar cual ha sido la Sucursal que mas ha echo pedidos 
+select top 1 s.ID_Sucursal, count(*)  NumPedidos
+from Pedido p
+inner join Sucursal s on p.ID_Sucursal = s.ID_Sucursal
+group by s.ID_Sucursal
+order by NumPedidos desc;
+
+--30-Los clientes que han comprado Productos provenientes de la familia 'Herbicidas' asi como las veces que lo han comprado
+select c.Nombre, count(*) as Cantidadcomprada
+from Cliente c
+inner join Pedido p on c.ID_Cliente = p.ID_Cliente
+inner join Detalle d on p.ID_Pedido = d.ID_Pedido
+inner join Producto pr on d.UPC = pr.UPC
+inner join Familia f on pr.ID_Familia = f.ID_Familia
+where f.FamiliaNombre = 'Herbicidas'
+group by c.Nombre
 
 
