@@ -59,6 +59,7 @@ ID_Pedido int not null,
 UPC int not null,
 Cantidad int not null,
 PrecioFinal money not null default 0.0,
+ID_Almacen int not null,
 )
 create table Inventario 
 (
@@ -188,6 +189,9 @@ go
 Alter table Detalle add constraint fk_DetallePedido foreign key (ID_Pedido) references pedido (ID_Pedido)
 Alter table Detalle add constraint fk_DetalleUPC foreign key (UPC) references Producto (UPC)
 Alter table Detalle add constraint pk_DetallePedido_UPC primary key (ID_Pedido,UPC)
+
+Alter table Detalle add constraint fk_DetalleInventarioAlmacen foreign key (ID_Almacen,UPC) references Inventario (ID_Almacen,UPC)
+
 
 
 
