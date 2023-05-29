@@ -241,4 +241,3 @@ inner join Familia f on pr.ID_Familia = f.ID_Familia
 where f.FamiliaNombre = 'Herbicidas'
 group by c.Nombre
 
-
