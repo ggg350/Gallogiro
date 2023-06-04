@@ -1,0 +1,16 @@
+Info dependiente de Seguridad.sql
+Usuarios  Logins  ejemplo ID , Contraseña
+---------------------------------------------------------------------------------------------------------
+Vendedor , Capaz de insertar ventas (Detalle) y (Pedido)
+amlo 123
+---------------------------------------------------------------------------------------------------------
+Gestor inventario General, Capaz de gestionar todo el inventario de todos los Almacenes asi como hacer traslados
+juan 123
+---------------------------------------------------------------------------------------------------------
+Logistica , Mirar las Zonas y las ventas de cada sucursal que estas componen , asi como la gestion que tienen las mismas
+taco 123
+------------------------- --------------------------------------------------------------------------------
+Contador , Capaz de saber las ventas de la empresa que ocurre en cada punto de venta , asi como las vistas que esta incluye (reportes anuales=
+tamal 123
+---------------------------------------------------------------------------------------------------------
+
