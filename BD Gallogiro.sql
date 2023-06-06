@@ -13,6 +13,7 @@ create table Zona
 (
 ID_Zona int not null,
 Nombre nvarchar (50) not null,
+UNIQUE (Nombre)
 )
 create table Almacen 
 (
@@ -112,27 +113,29 @@ create table Tipodeentrega
 ID_Tipodeentrega int not null, 
 Nombre nvarchar(50) not null,
 )
+
 create table Entrega 
 (
-ID_Entrega int not null , 
+ID_Entrega int not null, 
 ID_Almacen int not null,
-ID_Pedido int unique not null,
-ID_Tipodeentrega int not null,
+ID_Pedido int unique null,
+ID_Tipodeentrega int null,
 Direcciondeentrega nvarchar (100) null,
 Nombredestinatario nvarchar (50) null,
-Estatusdeentrega nvarchar (30) not null,
+Estatusdeentrega nvarchar (30) null,
 Recibio nvarchar (30) null,
 )
 create table Pedido 
 (
 ID_Pedido int not null, 
 ID_Entrega int unique not null,
-ID_Cliente int null,
-ID_Formatodepago int not null,
+ID_Cliente int not null,
+ID_Formatodepago int null,
 ID_Sucursal int not null,
-Fecha date not null,
+Fecha date null,
 
 )
+
 create table Empleado 
 (
 ID_Empleado int not null,
@@ -142,6 +145,8 @@ CURP nvarchar (50) not null,
 RFC nvarchar (50) not null,
 Domicilio nvarchar (100) null,
 Telefono varchar (20) null,
+UNIQUE (CURP),
+UNIQUE (RFC),
 )
 create table TrasladoInventario
 (
@@ -151,6 +156,13 @@ ID_AlmacenDestino int not null,
 UPC int not null,
 Cantidad int not null,
 Fecha date not null,
+)
+create table Credito
+(
+ID_Cliente int not null,
+Cantidad money default 0,
+FechaInicio date not null,
+FechaFinal date not null,
 )
 
 go
@@ -172,12 +184,12 @@ Alter table Entrega add constraint PK_ID_Entrega primary key (ID_Entrega)
 Alter table Pedido add constraint pk_Pedido primary key (ID_Pedido)
 
 --ti
-Alter table TrasladoInventario add constraint pk_ID_TrasladoInventario primary key (ID_TrasladoInventario)
+
 Alter table TrasladoInventario add constraint fk_ID_TrasladoInventarioAlmacenOrigen foreign key (ID_AlmacenOrigen) references Almacen (ID_Almacen)
 Alter table TrasladoInventario add constraint fk_ID_TrasladoInventarioAlmacenDestino foreign key (ID_AlmacenDestino) references Almacen (ID_Almacen)
 Alter table TrasladoInventario add constraint fk_ID_TrasladoInventarioUPC foreign key (UPC) references Producto (UPC)
 -- -------------------??????????????????? -- -------------------??????????????????? -- -------------------??????????????????? 
---Alter table TrasladoInventario add constraint FK_Traslado_Inventario foreign key (ID_AlmacenOrigen, UPC) references Inventario (ID_Almacen, UPC)
+Alter table TrasladoInventario add constraint pk_TrasladoInventarioUPC primary key (ID_TrasladoInventario,UPC)
 -- -------------------??????????????????? -- -------------------??????????????????? -- -------------------??????????????????? 
 go
 Alter table Municipio add constraint pk_Municipio_ID_Zona primary key (ID_Zona,ID_Municipio)
@@ -213,3 +225,11 @@ Alter table Detalle add constraint fk_DetalleUPC foreign key (UPC) references Pr
 Alter table Detalle add constraint pk_DetallePedido_UPC primary key (ID_Pedido,UPC)
 
 Alter table Detalle add constraint fk_DetalleInventarioAlmacen foreign key (ID_Almacen,UPC) references Inventario (ID_Almacen,UPC)
+
+Alter table Credito add constraint fk_CreditoCliente foreign key (ID_Cliente) references Cliente (ID_Cliente)
+
+
+--Restricciones
+Alter table TrasladoInventario add constraint ck_TrasladoInvIDS check (ID_AlmacenOrigen <>ID_AlmacenDestino) --El Origen y el destino no pueden ser el mismo
+
+insert into Credito values (1,'500','2021-05-04','2021-06-04')
